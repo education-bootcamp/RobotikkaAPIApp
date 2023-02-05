@@ -1,12 +1,13 @@
 // save => DONE
 // send email => DONE
 // encrypt password => DONE
-// create token => PENDING
+// create token => DONE
 // check whether already exists or not => PENDING
 
 const nodemailer = require("nodemailer");
 const UserSchema= require('../model/User');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const registerUser=  (req,resp)=>{
 
     bcrypt.hash(req.body.password, 10, function(err, hash) {
@@ -18,10 +19,11 @@ const registerUser=  (req,resp)=>{
         });
 
         user.save().then(async result=>{
+            let token = jwt.sign({ email: result.email,fullName:result.fullName}, process.env.PRIVATE_KEY);
             let responseObject={
                 message:'user created',
                 email:result.email,
-                token:'token'
+                token:token
             }
 
             let transporter = nodemailer.createTransport({
@@ -41,9 +43,6 @@ const registerUser=  (req,resp)=>{
                 text: "Registration completed", // plain text body
                 html: "<b>Registration completed!</b>", // html body
             });
-
-
-
             resp.status(201).json(responseObject);
         }).catch(error=>{
             resp.status(500).json(error);
