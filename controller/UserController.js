@@ -360,10 +360,34 @@ const registerUser = (req, resp) => {
 
             });
         } else {
-            resp.status(404).json({'message': 'already exists!'});
+            resp.status(409).json({'message': 'already exists!'});
         }
     }).catch(error => {
         resp.status(500).json(error);
     })
 }
-module.exports={registerUser}
+const login = (req, resp) => {
+    UserSchema.findOne({email: req.body.email}).then(result => {
+        if (result !== null) {
+            bcrypt.compare(req.body.password, result.password, function(err, isTokenOk) {
+                if (isTokenOk){
+                    let token = jwt.sign({email: result.email, fullName: result.fullName}, process.env.PRIVATE_KEY);
+                    let responseObject = {
+                        message: 'user Logged!',
+                        email: result.email,
+                        token: token
+                    }
+                    resp.status(200).json(responseObject);
+                }else{
+                    resp.status(403).json({'message': 'password not match!'});
+                }
+            });
+
+        }else{
+            resp.status(404).json({'message': 'email not found!'});
+        }
+    }).catch(errort => {
+        resp.status(500).json(error);
+    });
+}
+module.exports = {registerUser, login}
