@@ -12,6 +12,7 @@ var jsonParser = bodyParser.json()
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 //================
 const UserRoute = require('./routes/UserRoute');
+const ProductRoute = require('./routes/ProductRoute');
 //================
 
 const app = express();
@@ -29,3 +30,4 @@ mongoose.connect('mongodb://localhost:27017/robotikka_db')
 });
 //=================
 app.use('/api/v1/user', UserRoute);
+app.use('/api/v1/product', ProductRoute);
