@@ -11,7 +11,7 @@ const createOrder = (req, resp) => {
     let token = req.header('authorization');
     if (token.toString().startsWith('Bearer ')) {
         token = token.toString().replace('Bearer ', '');
-
+// async await
         jwt.verify(token, process.env.PRIVATE_KEY, function (err, decoded) {
             if (err) {
                 resp.status(503).json({'message': 'Wrong token'});
